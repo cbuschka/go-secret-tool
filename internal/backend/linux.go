@@ -9,7 +9,8 @@ type linuxBackend struct {
 }
 
 type linuxSecret struct {
-	name string
+	name  string
+	value string
 }
 
 const (
@@ -30,7 +31,14 @@ func (b *linuxBackend) ListSecrets() ([]Secret, error) {
 
 	secrets := []Secret{}
 	for _, result := range itemResults {
-		secrets = append(secrets, Secret(&linuxSecret{name: result.LabelName}))
+		if result.Secret.ContentType == "text/plain" {
+			bs, err := result.Secret.Value.MarshalJSON()
+			if err != nil {
+				return nil, err
+			}
+			value := string(bs)
+			secrets = append(secrets, Secret(&linuxSecret{name: result.LabelName, value: value}))
+		}
 	}
 
 	return secrets, nil
@@ -51,4 +59,8 @@ func newLinuxBackend() (*linuxBackend, error) {
 
 func (s *linuxSecret) Name() string {
 	return s.name
+}
+
+func (s *linuxSecret) Value() string {
+	return s.value
 }

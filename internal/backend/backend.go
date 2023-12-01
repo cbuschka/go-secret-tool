@@ -2,6 +2,7 @@ package backend
 
 type Secret interface {
 	Name() string
+	Value() string
 }
 
 type Backend interface {

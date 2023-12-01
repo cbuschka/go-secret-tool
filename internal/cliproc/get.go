@@ -1,11 +1,11 @@
-package cli
+package cliproc
 
 import (
 	"fmt"
 	"github.io/cbuschka/go-secret-tool/internal/backend"
 )
 
-func ListSecrets() error {
+func GetSecret(name string) error {
 	b, err := backend.GetBackend()
 	if err != nil {
 		return err
@@ -17,9 +17,12 @@ func ListSecrets() error {
 		return err
 	}
 
-	for index, secret := range secrets {
-		fmt.Printf("%d %s\n", index, secret.Name())
+	for _, secret := range secrets {
+		if name == secret.Name() {
+			fmt.Printf("%s", secret.Value())
+			return nil
+		}
 	}
 
-	return nil
+	return fmt.Errorf("secret not found")
 }
